@@ -164,3 +164,23 @@ fn find_latest_change(dir: DirEntry) -> Option<(PathBuf, SystemTime)> {
 
 	latest_modified_time.map(|modified_time| (dir.path().to_path_buf(), modified_time))
 }
+
+pub fn list_repos(paths: &[PathBuf]) -> Vec<PathBuf> {
+  paths
+    .par_iter()
+    .flat_map(|path| {
+      WalkDir::new(path)
+        .max_depth(1)
+        .into_iter()
+        .filter_map(Result::ok)
+        .par_bridge()
+    })
+    .filter_map(|dir| {
+      if dir.file_type().is_dir() {
+        Repository::open(dir.path()).ok().map(|_| dir.path().to_path_buf())
+      } else {
+        None
+      }
+    })
+    .collect()
+}

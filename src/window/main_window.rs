@@ -65,6 +65,10 @@ pub fn on_open(window: Window) {
 			return Err(anyhow!("No repo found"));
 		};
 
+    window.emit("all_repositories", repo::list_repos(&config.repo_paths))?;
+
+    println!("{:?}",repo::list_repos(&config.repo_paths));
+
 		window.emit("current_dir", &repo_path)?;
 
 		let repo = Repository::open(&repo_path)?;

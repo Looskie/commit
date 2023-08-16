@@ -1,8 +1,10 @@
+import Dropdown from './components/Dropdown'
 import { listen } from '@tauri-apps/api/event'
 import { invoke } from '@tauri-apps/api/tauri'
 import useTauriValue from '@/hooks/useTauriValue'
 import useTauriReset from '@/hooks/useTauriReset'
 import { motion, AnimatePresence } from 'framer-motion'
+import RepositorySelector from './components/dropdowns/RepositorySelector'
 import { FormEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { RepoIcon, GitBranchIcon, RepoTemplateIcon } from '@primer/octicons-react'
 
@@ -10,6 +12,15 @@ type DiffStats = {
 	deletions: number
 	insertions: number
 	files_changed: number
+}
+
+const OPACITY_ANIMATION = {
+	initial: {
+		opacity: 0,
+	},
+	animate: {
+		opacity: 1,
+	},
 }
 
 const Commit = () => {
@@ -57,27 +68,29 @@ const Commit = () => {
 			onSubmit={commit}
 		>
 			<AnimatePresence>
-				<div className="flex items-center justify-between px-4 pt-4 pb-2 pr-6">
+				<div className="flex items-center justify-between px-3 pt-3 pb-1 pr-6">
 					{repo ? (
-						<div className="flex items-center space-x-2">
-							<RepoIcon className="text-black/50 dark:text-white/50 mt-px" />
+						<Dropdown render={<RepositorySelector />} align="start" side="bottom">
+							<button className="flex items-center space-x-2 p-1 rounded-lg hover:bg-white hover:dark:bg-white/10">
+								<RepoIcon className="text-black/50 dark:text-white/50 mt-px" />
 
-							<motion.p
-								key="active-repo"
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								className="font-medium text-black/80 dark:text-white/80"
-							>
-								{repo}
-							</motion.p>
-						</div>
+								<motion.p
+									key="active-repo"
+									initial={OPACITY_ANIMATION.initial}
+									animate={OPACITY_ANIMATION.animate}
+									className="font-medium text-black/80 dark:text-white/80"
+								>
+									{repo}
+								</motion.p>
+							</button>
+						</Dropdown>
 					) : (
-						<div className="flex items-center space-x-2">
+						<div className="flex items-center space-x-2 p-1">
 							<RepoTemplateIcon className="text-black/50 dark:text-white/50 mt-px" />
 							<motion.p
 								key="loading-repo"
-								exit={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
+								exit={OPACITY_ANIMATION.initial}
+								animate={OPACITY_ANIMATION.animate}
 								className="font-medium text-transparent animate-pulse bg-neutral-200 dark:bg-white/10 rounded-lg"
 							>
 								tailwindlabs/tailwindcss
@@ -90,8 +103,8 @@ const Commit = () => {
 							<motion.p
 								layout
 								key="active-branch"
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
+								initial={OPACITY_ANIMATION.initial}
+								animate={OPACITY_ANIMATION.animate}
 								className="font-medium text-black/80 dark:text-white/80"
 							>
 								{branch}
@@ -100,8 +113,8 @@ const Commit = () => {
 							<motion.p
 								layout
 								key="loading-branch"
-								exit={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
+								exit={OPACITY_ANIMATION.initial}
+								animate={OPACITY_ANIMATION.animate}
 								className="font-medium text-transparent animate-pulse bg-neutral-200 dark:bg-white/10 rounded-lg"
 							>
 								master
@@ -138,9 +151,9 @@ const Commit = () => {
 					{diff?.files_changed === 0 ? (
 						<motion.p
 							key="no-changes"
-							exit={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							initial={{ opacity: 0 }}
+							exit={OPACITY_ANIMATION.initial}
+							animate={OPACITY_ANIMATION.animate}
+							initial={OPACITY_ANIMATION.initial}
 							className="text-black/40 dark:text-white/50"
 						>
 							No changes detected
@@ -160,9 +173,9 @@ const Commit = () => {
 									<AnimatePresence>
 										{diff?.insertions != null && (
 											<motion.p
-												exit={{ opacity: 0 }}
-												initial={{ opacity: 0 }}
-												animate={{ opacity: 1 }}
+												exit={OPACITY_ANIMATION.initial}
+												initial={OPACITY_ANIMATION.initial}
+												animate={OPACITY_ANIMATION.animate}
 												className="text-green-600"
 											>
 												+{diff.insertions}{' '}
@@ -172,10 +185,10 @@ const Commit = () => {
 									<AnimatePresence mode="popLayout">
 										{diff?.deletions != null && (
 											<motion.p
-												exit={{ opacity: 0 }}
+												exit={OPACITY_ANIMATION.initial}
 												key="active-deletions"
-												initial={{ opacity: 0 }}
-												animate={{ opacity: 1 }}
+												initial={OPACITY_ANIMATION.initial}
+												animate={OPACITY_ANIMATION.animate}
 												className="text-red-600"
 											>
 												{' '}
@@ -198,9 +211,9 @@ const Commit = () => {
 					{diff?.files_changed !== 0 && (
 						<motion.button
 							type="submit"
-							exit={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							initial={{ opacity: 0 }}
+							exit={OPACITY_ANIMATION.initial}
+							animate={OPACITY_ANIMATION.animate}
+							initial={OPACITY_ANIMATION.initial}
 							className="bg-white dark:bg-white/10 border dark:border-white/10 shadow rounded-lg flex items-center space-x-2 py-1 px-2"
 						>
 							<p className="font-medium text-black/80 dark:text-white/80">Commit</p>
